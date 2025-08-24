@@ -31,7 +31,7 @@ message board or in the OpenSees Facebook group.
 + https://opensees.berkeley.edu/community
 + https://facebook.com/groups/opensees
 
-# Build Steps with New Dockerized System
+# Build OpenSees with New Dockerized System
 * Navigate to the root directory of the repository
 
 * Create image using dev/Dockerfile.dev
@@ -48,4 +48,16 @@ docker-compose -f dev/opensees_dev.yml up -d
 ```
 chmod +x dev/build_opensees.sh
 ./dev/build_opensees.sh
+```
+
+## Use Python bindings in Docker container
+* Do the followings after completings steps for "Build OpenSees with New Dockerized System"
+1. Call script to create python dev environment
+```
+source /workspace/dev/create_python_dev.sh
+```
+
+2. Your directory is changed to /workspace/hysteretic_olm in container. Directly call python interpreter
+```
+python main.py
 ```

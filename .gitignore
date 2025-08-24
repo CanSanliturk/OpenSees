@@ -91,3 +91,6 @@ build
 bin
 __pycache__
 *.dat
+
+# custom
+venv
