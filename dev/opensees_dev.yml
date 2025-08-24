@@ -1,0 +1,10 @@
+version: '3.8'
+
+services:
+  opensees-dev:
+    image: opensees-dev
+    platform: linux/amd64
+    volumes:
+      - ./../:/workspace
+    tty: true
+    command: sleep infinity

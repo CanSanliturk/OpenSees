@@ -1,0 +1,61 @@
+# Dockerfile to build OpenSees
+#   .. utilizes ubuntu:22.04 LTS as base
+#   .. it will build sequential version and place in /usr/local/bin
+
+# written: fmk
+
+FROM ubuntu:22.04
+
+SHELL ["/bin/bash", "-c"]
+
+RUN apt-get update && \
+    apt-get install -y \
+        cmake \
+        gcc-11 g++-11 gfortran-11 \
+        python3-pip python3-venv \
+        liblapack-dev \
+        libopenmpi-dev \
+        libscalapack-openmpi-dev \
+        git \
+        make \
+        sudo \
+        vim \
+        wget
+
+WORKDIR /workspace
+
+RUN cp /etc/apt/sources.list /etc/apt/sources.list~ \
+    && sed -Ei 's/^# deb-src /deb-src /' /etc/apt/sources.list \
+    && apt-get update \
+    && DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get -y install tzdata git \
+    && apt-get install -y sudo \
+    && sudo apt install -y cmake gcc g++ gfortran liblapack-dev git python3-pip \
+    && pip3 install conan==1.60.1 && \
+    conan profile new default --detect && \
+    conan profile update settings.arch=x86_64 default \
+    && git clone --depth 1 --branch hdf5-1_12_2 https://github.com/HDFGroup/hdf5.git \
+    && cd hdf5 \
+    && ./configure --prefix=/usr/local/hdf5 \
+    && make \
+    && cd ..
+
+RUN git clone https://github.com/OpenSees/mumps.git \
+    && cd mumps \
+    && mkdir build \
+    && cd build \
+    && cmake .. -Darith=d -DCMAKE_INSTALL_PREFIX=/usr/local/mumps \
+    && cmake --build . --config Release --parallel 4 \
+    && cmake --install . \
+    && cd ../.. \
+    && rm -rf mumps
+
+ENV MUMPS_DIR=/usr/local/mumps
+
+RUN wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh && \
+    bash miniconda.sh -b -p /opt/conda && \
+    rm miniconda.sh && \
+    /opt/conda/bin/conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/main && \
+    /opt/conda/bin/conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/r && \
+    /opt/conda/bin/conda install -y mkl
+
+CMD ["sleep", "infinity"]

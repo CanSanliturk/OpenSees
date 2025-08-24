@@ -30,3 +30,22 @@ Issues related to modeling questions will be closed. Instead, post your modeling
 message board or in the OpenSees Facebook group.
 + https://opensees.berkeley.edu/community
 + https://facebook.com/groups/opensees
+
+# Build Steps with New Dockerized System
+* Navigate to the root directory of the repository
+
+* Create image using dev/Dockerfile.dev
+```
+docker build --platform linux/amd64 -t opensees-dev -f dev/Dockerfile.dev .
+```
+
+* Start container using the created image using docker-compose
+```
+docker-compose -f dev/opensees_dev.yml up -d
+```
+
+* Call build script to start compiling OpenSees
+```
+chmod +x dev/build_opensees.sh
+./dev/build_opensees.sh
+```
